@@ -1,0 +1,83 @@
+const userService = require('../services/userService');
+
+class UserController {
+  async register(req, res) {
+    try {
+      const { email, username, password } = req.body;
+      const result = await userService.register({ email, username, password });
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async login(req, res) {
+    try {
+      const { identifier, password } = req.body;
+      const result = await userService.login(identifier, password);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(401).json({ success: false, message: error.message });
+    }
+  }
+
+  async logout(req, res) {
+    try {
+      const { refreshToken } = req.body;
+      await userService.logout(refreshToken);
+      res.json({ success: true, message: 'Logged out' });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async updateUser(req, res) {
+    try {
+      const updates = req.body;
+      const user = await userService.updateUser(req.user.id, updates);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async changePassword(req, res) {
+    try {
+      const { oldPassword, newPassword } = req.body;
+      await userService.changePassword(req.user.id, oldPassword, newPassword);
+      res.json({ success: true, message: 'Password changed' });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async deleteUser(req, res) {
+    try {
+      await userService.deleteUser(req.user.id);
+      res.json({ success: true, message: 'User deleted' });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async refreshToken(req, res) {
+    try {
+      const { refreshToken } = req.body;
+      const result = await userService.refreshToken(refreshToken);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(401).json({ success: false, message: error.message });
+    }
+  }
+
+  async me(req, res) {
+    try {
+      const user = await userService.getMe(req.user.id);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(404).json({ success: false, message: error.message });
+    }
+  }
+}
+
+module.exports = new UserController();
