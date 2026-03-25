@@ -10,9 +10,20 @@ const pool = require('./config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://test-blog-site-chudar.vercel.app',
+];
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
