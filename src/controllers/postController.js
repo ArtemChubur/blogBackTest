@@ -77,6 +77,15 @@ class PostController {
     }
   }
 
+  async getImages(req, res) {
+    try {
+      const images = await postService.getSavedImages(req.query);
+      res.json({ success: true, data: images });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
   async editPost(req, res) {
     let uploadedImages = [];
 

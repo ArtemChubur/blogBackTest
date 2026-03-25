@@ -66,6 +66,10 @@ class PostService {
     }));
   }
 
+  async getSavedImages(query) {
+    return await postRepository.findAllImages(query);
+  }
+
   async getPostById(id) {
     return await postRepository.findById(id);
   }

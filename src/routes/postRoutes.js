@@ -41,6 +41,30 @@ router.get('/list', optionalAuthenticateToken, PostController.getPosts);
 
 /**
  * @swagger
+ * /post/images:
+ *   get:
+ *     summary: Get all saved images
+ *     tags: [Posts]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           maximum: 50
+ *         description: Number of images to return
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *     responses:
+ *       200:
+ *         description: List of saved images
+ */
+router.get('/images', PostController.getImages);
+
+/**
+ * @swagger
  * /post/publish:
  *   post:
  *     summary: Publish a new post (Admin only)

@@ -48,8 +48,12 @@ const checkTables = async () => {
   }
 };
 
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API docs available at http://localhost:${PORT}/api-docs`);
-  await checkTables();
-});
+if (require.main === module) {
+  app.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`API docs available at http://localhost:${PORT}/api-docs`);
+    await checkTables();
+  });
+}
+
+module.exports = app;

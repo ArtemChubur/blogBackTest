@@ -13,8 +13,8 @@ class PostRepository {
   async findAll({ limit = 20, page = 1, hashtag, q }) {
     let query = `
       SELECT p.*, u.username as author_username,
-             COUNT(r.id) as likes_count,
-             COUNT(CASE WHEN r.type = 'dislike' THEN 1 END) as dislikes_count
+             COUNT(r.id) FILTER (WHERE r.type = 'like') as likes_count,
+             COUNT(r.id) FILTER (WHERE r.type = 'dislike') as dislikes_count
       FROM posts p
       LEFT JOIN users u ON p.author_id = u.id
       LEFT JOIN reactions r ON p.id = r.post_id
@@ -52,6 +52,57 @@ class PostRepository {
 
     const result = await pool.query(query, values);
     return result.rows;
+  }
+
+  async findAllImages({ limit = 20, page = 1 }) {
+    const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 50);
+    const safePage = Math.max(parseInt(page, 10) || 1, 1);
+    const offset = (safePage - 1) * safeLimit;
+
+    const itemsResult = await pool.query(
+      `
+        WITH image_rows AS (
+          SELECT
+            p.id AS post_id,
+            p.text AS post_text,
+            p.author_id,
+            p.created_at,
+            img.image_url
+          FROM posts p
+          CROSS JOIN LATERAL unnest(COALESCE(p.images, ARRAY[]::text[])) AS img(image_url)
+        )
+        SELECT
+          image_rows.post_id,
+          image_rows.post_text,
+          image_rows.author_id,
+          image_rows.created_at,
+          image_rows.image_url,
+          u.username AS author_username
+        FROM image_rows
+        LEFT JOIN users u ON u.id = image_rows.author_id
+        ORDER BY image_rows.created_at DESC, image_rows.post_id DESC
+        LIMIT $1 OFFSET $2
+      `,
+      [safeLimit, offset]
+    );
+
+    const totalResult = await pool.query(`
+      SELECT COUNT(*)::int AS total
+      FROM posts p
+      CROSS JOIN LATERAL unnest(COALESCE(p.images, ARRAY[]::text[])) AS img(image_url)
+    `);
+
+    const total = totalResult.rows[0]?.total || 0;
+
+    return {
+      items: itemsResult.rows,
+      pagination: {
+        limit: safeLimit,
+        page: safePage,
+        total,
+        totalPages: total === 0 ? 0 : Math.ceil(total / safeLimit),
+      },
+    };
   }
 
   async findById(id) {
