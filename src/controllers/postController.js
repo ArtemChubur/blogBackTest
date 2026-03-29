@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const { Readable } = require('stream');
 const cloudinary = require('../config/cloudinary');
+const { translateErrorMessage } = require('../utils/errorMessages');
 
 const uploadToCloudinary = (file) => {
   return new Promise((resolve, reject) => {
@@ -45,7 +46,7 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     }
-    cb(new Error('Invalid file type'));
+    cb(new Error('Неверный формат файла'));
   }
 });
 
@@ -63,7 +64,7 @@ class PostController {
       if (uploadedImages.length > 0) {
         await postService.deleteImages(uploadedImages.map(image => image.secure_url)).catch(() => {});
       }
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -73,7 +74,7 @@ class PostController {
       const posts = await postService.getPosts(query);
       res.json({ success: true, data: posts });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -82,7 +83,7 @@ class PostController {
       const images = await postService.getSavedImages(req.query);
       res.json({ success: true, data: images });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -102,7 +103,7 @@ class PostController {
       if (uploadedImages.length > 0) {
         await postService.deleteImages(uploadedImages.map(image => image.secure_url)).catch(() => {});
       }
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -110,9 +111,9 @@ class PostController {
     try {
       const { id } = req.params;
       await postService.deletePost(id);
-      res.json({ success: true, message: 'Post deleted' });
+      res.json({ success: true, message: translateErrorMessage('Post deleted') });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -120,9 +121,9 @@ class PostController {
     try {
       const { postId, type } = req.body;
       await postService.handleReaction(req.user.id, postId, type);
-      res.json({ success: true, message: 'Reaction updated' });
+      res.json({ success: true, message: translateErrorMessage('Reaction updated') });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 }

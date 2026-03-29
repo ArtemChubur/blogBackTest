@@ -94,7 +94,7 @@ router.get('/images', PostController.getImages);
  *       400:
  *         description: Bad request
  *       403:
- *         description: Admin access required
+ *         description: Требуются права администратора
  */
 router.post('/publish', authenticateToken, adminOnly, upload.array('images', 5), PostController.publish);
 
@@ -133,7 +133,7 @@ router.post('/publish', authenticateToken, adminOnly, upload.array('images', 5),
  *       400:
  *         description: Bad request
  *       403:
- *         description: Admin access required
+ *         description: Требуются права администратора
  */
 router.put('/edit/:id', authenticateToken, adminOnly, upload.array('images', 5), PostController.editPost);
 
@@ -153,9 +153,9 @@ router.put('/edit/:id', authenticateToken, adminOnly, upload.array('images', 5),
  *           type: integer
  *     responses:
  *       200:
- *         description: Post deleted
+ *         description: Пост удалён
  *       403:
- *         description: Admin access required
+ *         description: Требуются права администратора
  */
 router.delete('/:id', authenticateToken, adminOnly, PostController.deletePost);
 
@@ -184,7 +184,7 @@ router.delete('/:id', authenticateToken, adminOnly, PostController.deletePost);
  *                 enum: [like, dislike]
  *     responses:
  *       200:
- *         description: Reaction updated
+ *         description: Реакция обновлена
  *       400:
  *         description: Bad request
  */

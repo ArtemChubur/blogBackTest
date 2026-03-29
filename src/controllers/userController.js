@@ -1,4 +1,5 @@
 const userService = require('../services/userService');
+const { translateErrorMessage } = require('../utils/errorMessages');
 
 class UserController {
   async register(req, res) {
@@ -7,7 +8,7 @@ class UserController {
       const result = await userService.register({ email, username, password });
       res.json({ success: true, data: result });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -17,7 +18,7 @@ class UserController {
       const result = await userService.login(identifier, password);
       res.json({ success: true, data: result });
     } catch (error) {
-      res.status(401).json({ success: false, message: error.message });
+      res.status(401).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -25,9 +26,9 @@ class UserController {
     try {
       const { refreshToken } = req.body;
       await userService.logout(refreshToken);
-      res.json({ success: true, message: 'Logged out' });
+      res.json({ success: true, message: translateErrorMessage('Logged out') });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -37,7 +38,7 @@ class UserController {
       const user = await userService.updateUser(req.user.id, updates);
       res.json({ success: true, data: user });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -45,18 +46,18 @@ class UserController {
     try {
       const { oldPassword, newPassword } = req.body;
       await userService.changePassword(req.user.id, oldPassword, newPassword);
-      res.json({ success: true, message: 'Password changed' });
+      res.json({ success: true, message: translateErrorMessage('Password changed') });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
   async deleteUser(req, res) {
     try {
       await userService.deleteUser(req.user.id);
-      res.json({ success: true, message: 'User deleted' });
+      res.json({ success: true, message: translateErrorMessage('User deleted') });
     } catch (error) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -66,7 +67,7 @@ class UserController {
       const result = await userService.refreshToken(refreshToken);
       res.json({ success: true, data: result });
     } catch (error) {
-      res.status(401).json({ success: false, message: error.message });
+      res.status(401).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 
@@ -75,7 +76,7 @@ class UserController {
       const user = await userService.getMe(req.user.id);
       res.json({ success: true, data: user });
     } catch (error) {
-      res.status(404).json({ success: false, message: error.message });
+      res.status(404).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 }

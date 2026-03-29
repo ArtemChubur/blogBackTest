@@ -63,7 +63,7 @@ router.post('/register', userController.register);
  *       200:
  *         description: Login successful
  *       401:
- *         description: Invalid credentials
+ *         description: Неверный логин или пароль
  */
 router.post('/login', userController.login);
 
@@ -88,7 +88,7 @@ router.post('/login', userController.login);
  *       200:
  *         description: Token refreshed
  *       401:
- *         description: Invalid refresh token
+ *         description: Недействительный refresh-токен
  */
 router.post('/refresh', userController.refreshToken);
 
@@ -113,7 +113,7 @@ router.post('/refresh', userController.refreshToken);
  *                 type: string
  *     responses:
  *       200:
- *         description: Logged out successfully
+ *         description: Выход выполнен успешно
  */
 router.post('/logout', userController.logout);
 
@@ -171,7 +171,7 @@ router.put('/', authenticateToken, userController.updateUser);
  *                 format: password
  *     responses:
  *       200:
- *         description: Password changed
+ *         description: Пароль изменён
  *       400:
  *         description: Bad request
  */
@@ -191,7 +191,7 @@ router.post('/change-password', authenticateToken, userController.changePassword
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: User not found
+ *         description: Пользователь не найден
  */
 router.get('/me', authenticateToken, userController.me);
 
@@ -205,7 +205,7 @@ router.get('/me', authenticateToken, userController.me);
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User deleted
+ *         description: Пользователь удалён
  *       400:
  *         description: Bad request
  */

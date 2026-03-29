@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const userRepository = require('../repositories/userRepository');
 const refreshTokenRepository = require('../repositories/refreshTokenRepository');
 require('dotenv').config();
+const { translateErrorMessage } = require('../utils/errorMessages');
 
 class UserService {
   async register(userData) {
@@ -17,7 +18,7 @@ class UserService {
   async login(identifier, password) {
     const user = await userRepository.findByEmailOrUsername(identifier);
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      throw new Error('Invalid credentials');
+      throw new Error(translateErrorMessage('Invalid credentials'));
     }
     const tokens = this.generateTokens(user);
     await this.saveRefreshToken(user.id, tokens.refreshToken);
@@ -40,7 +41,7 @@ class UserService {
   async changePassword(id, oldPassword, newPassword) {
     const user = await userRepository.findById(id);
     if (!(await bcrypt.compare(oldPassword, user.password_hash))) {
-      throw new Error('Invalid old password');
+      throw new Error(translateErrorMessage('Invalid old password'));
     }
     const passwordHash = await bcrypt.hash(newPassword, 10);
     await userRepository.update(id, { passwordHash });
@@ -52,7 +53,7 @@ class UserService {
 
   async getMe(id) {
     const user = await userRepository.findById(id);
-    if (!user) throw new Error('User not found');
+    if (!user) throw new Error(translateErrorMessage('User not found'));
     return this.sanitizeUser(user);
   }
 
@@ -77,7 +78,7 @@ class UserService {
 
   async refreshToken(refreshToken) {
     const tokenRecord = await refreshTokenRepository.findByToken(refreshToken);
-    if (!tokenRecord) throw new Error('Invalid refresh token');
+    if (!tokenRecord) throw new Error(translateErrorMessage('Invalid refresh token'));
     const user = await userRepository.findById(tokenRecord.user_id);
     const tokens = this.generateTokens(user);
     await refreshTokenRepository.delete(refreshToken);

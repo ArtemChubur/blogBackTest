@@ -37,7 +37,7 @@ const options = {
           type: 'object',
           properties: {
             success: { type: 'boolean', example: false },
-            message: { type: 'string', example: 'Access token required' },
+            message: { type: 'string', example: 'Требуется access-токен' },
             error: { type: 'string', nullable: true },
           },
           required: ['success', 'message'],
@@ -45,29 +45,29 @@ const options = {
       },
       responses: {
         UnauthorizedError: {
-          description: 'Unauthorized (401) - missing/invalid/expired token',
+          description: 'Неавторизован (401) - отсутствует, неверный или просроченный токен',
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/ErrorResponse' },
               examples: {
                 missingToken: {
-                  value: { success: false, message: 'Access token required' },
+                  value: { success: false, message: 'Требуется access-токен' },
                 },
                 invalidToken: {
-                  value: { success: false, message: 'Invalid or expired token' },
+                  value: { success: false, message: 'Недействительный или просроченный токен' },
                 },
               },
             },
           },
         },
         ForbiddenError: {
-          description: 'Forbidden (403) - valid token but not permitted',
+          description: 'Запрещено (403) - токен валиден, но доступ не разрешён',
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/ErrorResponse' },
               examples: {
                 forbidden: {
-                  value: { success: false, message: 'Forbidden' },
+                  value: { success: false, message: 'Доступ запрещён' },
                 },
               },
             },
