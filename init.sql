@@ -31,6 +31,19 @@ CREATE TABLE reactions (
   UNIQUE(user_id, post_id)
 );
 
+-- Comments table
+CREATE TABLE comments (
+  id SERIAL PRIMARY KEY,
+  post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+  author_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_comments_post_id ON comments(post_id);
+CREATE INDEX idx_comments_author_id ON comments(author_id);
+
 -- Hashtags table
 CREATE TABLE hashtags (
   id SERIAL PRIMARY KEY,
@@ -43,6 +56,16 @@ CREATE TABLE post_hashtags (
   hashtag_id INTEGER REFERENCES hashtags(id) ON DELETE CASCADE,
   PRIMARY KEY (post_id, hashtag_id)
 );
+
+-- Subscriptions table
+CREATE TABLE subscriptions (
+  subscriber_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  following_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  PRIMARY KEY (subscriber_id, following_id)
+);
+
+CREATE INDEX idx_subscriptions_subscriber_id ON subscriptions(subscriber_id);
+CREATE INDEX idx_subscriptions_following_id ON subscriptions(following_id);
 
 -- RefreshTokens table
 CREATE TABLE refresh_tokens (

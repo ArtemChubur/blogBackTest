@@ -45,9 +45,10 @@ class PostService {
   }
 
   async getPosts(query) {
-    const posts = await postRepository.findAll(query);
+    const { authUserId, ...filterQuery } = query;
+    const posts = await postRepository.findAll(filterQuery);
 
-    if (!query?.userId) {
+    if (!authUserId) {
       return posts.map((post) => ({
         ...post,
         user_reaction: null,
@@ -55,7 +56,7 @@ class PostService {
     }
 
     const reactions = await reactionRepository.findByUserAndPosts(
-      query.userId,
+      authUserId,
       posts.map(post => post.id)
     );
     const reactionByPostId = new Map(reactions.map(reaction => [reaction.post_id, reaction.type]));

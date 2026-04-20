@@ -13,6 +13,7 @@ const errorMessages = new Map([
   ['Password changed', 'Пароль изменён'],
   ['User deleted', 'Пользователь удалён'],
   ['Post deleted', 'Пост удалён'],
+  ['Comment deleted', 'Комментарий удалён'],
   ['Reaction updated', 'Реакция обновлена'],
   ['Invalid file type', 'Неверный формат файла'],
   ['Not allowed by CORS', 'Запрос с этого источника запрещён'],

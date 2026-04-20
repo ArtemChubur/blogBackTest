@@ -50,15 +50,46 @@ const upload = multer({
   }
 });
 
+const parseHashtags = (raw) => {
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  if (Array.isArray(raw)) {
+    return raw.map((tag) => String(tag).trim()).filter((tag) => tag.length > 0);
+  }
+
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (trimmed === '') {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map((tag) => String(tag).trim()).filter((tag) => tag.length > 0);
+      }
+    } catch (err) {
+      // ignore JSON parse errors and fallback to comma-separated parsing
+    }
+
+    return trimmed.split(',').map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+  }
+
+  return undefined;
+};
+
 class PostController {
   async publish(req, res) {
     let uploadedImages = [];
 
     try {
       const { text } = req.body;
+      const hashtags = parseHashtags(req.body.hashtags);
       uploadedImages = req.files && req.files.length > 0 ? await uploadManyToCloudinary(req.files) : [];
       const images = uploadedImages.map(image => image.secure_url);
-      const post = await postService.createPost({ text, images }, req.user.id);
+      const post = await postService.createPost({ text, images, hashtags }, req.user.id);
       res.json({ success: true, data: post });
     } catch (error) {
       if (uploadedImages.length > 0) {
@@ -70,7 +101,13 @@ class PostController {
 
   async getPosts(req, res) {
     try {
-      const query = { ...req.query, userId: req.user?.id };
+      const query = { ...req.query, authUserId: req.user?.id };
+      if (req.params?.userId) {
+        query.userId = req.params.userId;
+      }
+      if (req.params?.username) {
+        query.username = req.params.username;
+      }
       const posts = await postService.getPosts(query);
       res.json({ success: true, data: posts });
     } catch (error) {
@@ -92,7 +129,11 @@ class PostController {
 
     try {
       const { id } = req.params;
-      const updates = req.body;
+      const updates = { ...req.body };
+      const hashtags = parseHashtags(req.body.hashtags);
+      if (hashtags !== undefined) {
+        updates.hashtags = hashtags;
+      }
       if (req.files && req.files.length > 0) {
         uploadedImages = await uploadManyToCloudinary(req.files);
         updates.images = uploadedImages.map(image => image.secure_url);

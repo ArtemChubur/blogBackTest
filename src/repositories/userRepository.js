@@ -23,6 +23,56 @@ class UserRepository {
     return result.rows[0];
   }
 
+  async findProfileById(id) {
+    const userResult = await pool.query(
+      `WITH stats AS (
+        SELECT
+          (SELECT COUNT(*) FROM subscriptions WHERE subscriber_id = $1) AS following_count,
+          (SELECT COUNT(*) FROM posts WHERE author_id = $1) AS post_count
+      )
+      SELECT u.*, stats.following_count, stats.post_count
+      FROM users u, stats
+      WHERE u.id = $1`,
+      [id]
+    );
+
+    const user = userResult.rows[0];
+    if (!user) {
+      return null;
+    }
+
+    const followingResult = await pool.query(
+      `SELECT u.id, u.username
+       FROM subscriptions s
+       JOIN users u ON s.following_id = u.id
+       WHERE s.subscriber_id = $1
+       ORDER BY u.username`,
+      [id]
+    );
+
+    return {
+      ...user,
+      following: followingResult.rows,
+    };
+  }
+
+  async createSubscription(subscriberId, followingId) {
+    if (subscriberId === followingId) {
+      return;
+    }
+    await pool.query(
+      'INSERT INTO subscriptions (subscriber_id, following_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+      [subscriberId, followingId]
+    );
+  }
+
+  async deleteSubscription(subscriberId, followingId) {
+    await pool.query(
+      'DELETE FROM subscriptions WHERE subscriber_id = $1 AND following_id = $2',
+      [subscriberId, followingId]
+    );
+  }
+
   async update(id, updates) {
     const fields = [];
     const values = [];

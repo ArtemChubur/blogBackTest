@@ -40,7 +40,7 @@ app.use(errorHandler);
 
 const checkTables = async () => {
   try {
-    const tables = ['users', 'posts', 'reactions', 'hashtags', 'post_hashtags', 'refresh_tokens'];
+    const tables = ['users', 'posts', 'reactions', 'hashtags', 'post_hashtags', 'refresh_tokens', 'subscriptions'];
     for (const table of tables) {
       const result = await pool.query(`
         SELECT EXISTS (

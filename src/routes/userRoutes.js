@@ -197,6 +197,70 @@ router.get('/me', authenticateToken, userController.me);
 
 /**
  * @swagger
+ * /user/{id}:
+ *   get:
+ *     summary: Get user data by id
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User fetched successfully
+ *       404:
+ *         description: Пользователь не найден
+ */
+router.get('/:id', userController.getById);
+
+/**
+ * @swagger
+ * /user/{id}/follow:
+ *   post:
+ *     summary: Subscribe to a user
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Subscribed successfully
+ *       400:
+ *         description: Bad request
+ */
+router.post('/:id/follow', authenticateToken, userController.follow);
+
+/**
+ * @swagger
+ * /user/{id}/follow:
+ *   delete:
+ *     summary: Unsubscribe from a user
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Unsubscribed successfully
+ *       400:
+ *         description: Bad request
+ */
+router.delete('/:id/follow', authenticateToken, userController.unfollow);
+
+/**
+ * @swagger
  * /user:
  *   delete:
  *     summary: Delete user account

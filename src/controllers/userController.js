@@ -71,12 +71,39 @@ class UserController {
     }
   }
 
+  async getById(req, res) {
+    try {
+      const user = await userService.getUserById(req.params.id);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(404).json({ success: false, message: translateErrorMessage(error) });
+    }
+  }
+
   async me(req, res) {
     try {
       const user = await userService.getMe(req.user.id);
       res.json({ success: true, data: user });
     } catch (error) {
       res.status(404).json({ success: false, message: translateErrorMessage(error) });
+    }
+  }
+
+  async follow(req, res) {
+    try {
+      const user = await userService.follow(req.user.id, req.params.id);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
+    }
+  }
+
+  async unfollow(req, res) {
+    try {
+      const user = await userService.unfollow(req.user.id, req.params.id);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
     }
   }
 }

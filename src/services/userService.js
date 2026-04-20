@@ -52,9 +52,34 @@ class UserService {
   }
 
   async getMe(id) {
-    const user = await userRepository.findById(id);
+    const user = await userRepository.findProfileById(id);
     if (!user) throw new Error(translateErrorMessage('User not found'));
     return this.sanitizeUser(user);
+  }
+
+  async getUserById(id) {
+    const user = await userRepository.findProfileById(id);
+    if (!user) throw new Error(translateErrorMessage('User not found'));
+    return this.sanitizeUser(user);
+  }
+
+  async follow(userId, targetId) {
+    const parsedTargetId = parseInt(targetId, 10);
+    if (userId === parsedTargetId) {
+      throw new Error(translateErrorMessage('Cannot subscribe to yourself'));
+    }
+    const targetUser = await userRepository.findById(parsedTargetId);
+    if (!targetUser) {
+      throw new Error(translateErrorMessage('User not found'));
+    }
+    await userRepository.createSubscription(userId, parsedTargetId);
+    return await this.getMe(userId);
+  }
+
+  async unfollow(userId, targetId) {
+    const parsedTargetId = parseInt(targetId, 10);
+    await userRepository.deleteSubscription(userId, parsedTargetId);
+    return await this.getMe(userId);
   }
 
   generateTokens(user) {
