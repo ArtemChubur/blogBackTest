@@ -75,8 +75,17 @@ class PostService {
     return await postRepository.findById(id);
   }
 
-  async updatePost(id, updates) {
+  async updatePost(id, updates, userId, isAdmin = false) {
     const post = await postRepository.findById(id);
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // Check if user can edit this post (own post or admin)
+    if (!isAdmin && post.author_id !== userId) {
+      throw new Error('Access denied');
+    }
+
     const previousImages = Array.isArray(post?.images) ? post.images : [];
     const shouldReplaceImages = Object.prototype.hasOwnProperty.call(updates, 'images');
     const updatedPost = await postRepository.update(id, updates);
@@ -88,8 +97,17 @@ class PostService {
     return updatedPost;
   }
 
-  async deletePost(id) {
+  async deletePost(id, userId, isAdmin = false) {
     const post = await postRepository.findById(id);
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // Check if user can delete this post (own post or admin)
+    if (!isAdmin && post.author_id !== userId) {
+      throw new Error('Access denied');
+    }
+
     if (post) {
       const client = await require('../config/database').connect();
       try {

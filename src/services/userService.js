@@ -63,6 +63,12 @@ class UserService {
     return this.sanitizeUser(user);
   }
 
+  async getUserByUsername(username) {
+    const user = await userRepository.findProfileByUsername(username);
+    if (!user) throw new Error(translateErrorMessage('User not found'));
+    return this.sanitizeUser(user);
+  }
+
   async follow(userId, targetId) {
     const parsedTargetId = parseInt(targetId, 10);
     if (userId === parsedTargetId) {
@@ -76,9 +82,30 @@ class UserService {
     return await this.getMe(userId);
   }
 
+  async followByUsername(userId, targetUsername) {
+    const targetUser = await userRepository.findByUsername(targetUsername);
+    if (!targetUser) {
+      throw new Error(translateErrorMessage('User not found'));
+    }
+    if (userId === targetUser.id) {
+      throw new Error(translateErrorMessage('Cannot subscribe to yourself'));
+    }
+    await userRepository.createSubscription(userId, targetUser.id);
+    return await this.getMe(userId);
+  }
+
   async unfollow(userId, targetId) {
     const parsedTargetId = parseInt(targetId, 10);
     await userRepository.deleteSubscription(userId, parsedTargetId);
+    return await this.getMe(userId);
+  }
+
+  async unfollowByUsername(userId, targetUsername) {
+    const targetUser = await userRepository.findByUsername(targetUsername);
+    if (!targetUser) {
+      throw new Error(translateErrorMessage('User not found'));
+    }
+    await userRepository.deleteSubscription(userId, targetUser.id);
     return await this.getMe(userId);
   }
 

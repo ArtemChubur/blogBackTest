@@ -23,6 +23,11 @@ class UserRepository {
     return result.rows[0];
   }
 
+  async findByUsername(username) {
+    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    return result.rows[0];
+  }
+
   async findProfileById(id) {
     const userResult = await pool.query(
       `WITH stats AS (
@@ -48,6 +53,39 @@ class UserRepository {
        WHERE s.subscriber_id = $1
        ORDER BY u.username`,
       [id]
+    );
+
+    return {
+      ...user,
+      following: followingResult.rows,
+    };
+  }
+
+  async findProfileByUsername(username) {
+    const userResult = await pool.query(
+      `WITH stats AS (
+        SELECT
+          (SELECT COUNT(*) FROM subscriptions WHERE subscriber_id = (SELECT id FROM users WHERE username = $1)) AS following_count,
+          (SELECT COUNT(*) FROM posts WHERE author_id = (SELECT id FROM users WHERE username = $1)) AS post_count
+      )
+      SELECT u.*, stats.following_count, stats.post_count
+      FROM users u, stats
+      WHERE u.username = $1`,
+      [username]
+    );
+
+    const user = userResult.rows[0];
+    if (!user) {
+      return null;
+    }
+
+    const followingResult = await pool.query(
+      `SELECT u.id, u.username
+       FROM subscriptions s
+       JOIN users u ON s.following_id = u.id
+       WHERE s.subscriber_id = $1
+       ORDER BY u.username`,
+      [user.id]
     );
 
     return {

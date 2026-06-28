@@ -138,7 +138,7 @@ class PostController {
         uploadedImages = await uploadManyToCloudinary(req.files);
         updates.images = uploadedImages.map(image => image.secure_url);
       }
-      const post = await postService.updatePost(id, updates);
+      const post = await postService.updatePost(id, updates, req.user.id, req.user.isAdmin);
       res.json({ success: true, data: post });
     } catch (error) {
       if (uploadedImages.length > 0) {
@@ -151,7 +151,7 @@ class PostController {
   async deletePost(req, res) {
     try {
       const { id } = req.params;
-      await postService.deletePost(id);
+      await postService.deletePost(id, req.user.id, req.user.isAdmin);
       res.json({ success: true, message: translateErrorMessage('Post deleted') });
     } catch (error) {
       res.status(400).json({ success: false, message: translateErrorMessage(error) });

@@ -246,7 +246,7 @@ router.get('/images', PostController.getImages);
  * @swagger
  * /post/publish:
  *   post:
- *     summary: Publish a new post (Admin only)
+ *     summary: Publish a new post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -277,16 +277,14 @@ router.get('/images', PostController.getImages);
  *         description: Post published
  *       400:
  *         description: Bad request
- *       403:
- *         description: Требуются права администратора
  */
-router.post('/publish', authenticateToken, adminOnly, upload.array('images', 5), PostController.publish);
+router.post('/publish', authenticateToken, upload.array('images', 5), PostController.publish);
 
 /**
  * @swagger
  * /post/edit/{id}:
  *   put:
- *     summary: Edit a post (Admin only)
+ *     summary: Edit a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -321,16 +319,14 @@ router.post('/publish', authenticateToken, adminOnly, upload.array('images', 5),
  *         description: Post updated
  *       400:
  *         description: Bad request
- *       403:
- *         description: Требуются права администратора
  */
-router.put('/edit/:id', authenticateToken, adminOnly, upload.array('images', 5), PostController.editPost);
+router.put('/edit/:id', authenticateToken, upload.array('images', 5), PostController.editPost);
 
 /**
  * @swagger
  * /post/{id}:
  *   delete:
- *     summary: Delete a post (Admin only)
+ *     summary: Delete a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
@@ -343,10 +339,8 @@ router.put('/edit/:id', authenticateToken, adminOnly, upload.array('images', 5),
  *     responses:
  *       200:
  *         description: Пост удалён
- *       403:
- *         description: Требуются права администратора
  */
-router.delete('/:id', authenticateToken, adminOnly, PostController.deletePost);
+router.delete('/:id', authenticateToken, PostController.deletePost);
 
 /**
  * @swagger

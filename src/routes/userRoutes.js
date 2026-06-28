@@ -197,6 +197,26 @@ router.get('/me', authenticateToken, userController.me);
 
 /**
  * @swagger
+ * /user/username/{username}:
+ *   get:
+ *     summary: Get user data by username
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User fetched successfully
+ *       404:
+ *         description: Пользователь не найден
+ */
+router.get('/username/:username', userController.getByUsername);
+
+/**
+ * @swagger
  * /user/{id}:
  *   get:
  *     summary: Get user data by id
@@ -219,7 +239,7 @@ router.get('/:id', userController.getById);
  * @swagger
  * /user/{id}/follow:
  *   post:
- *     summary: Subscribe to a user
+ *     summary: Subscribe to a user by ID
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -239,9 +259,31 @@ router.post('/:id/follow', authenticateToken, userController.follow);
 
 /**
  * @swagger
+ * /user/username/{username}/follow:
+ *   post:
+ *     summary: Subscribe to a user by username
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Subscribed successfully
+ *       400:
+ *         description: Bad request
+ */
+router.post('/username/:username/follow', authenticateToken, userController.followByUsername);
+
+/**
+ * @swagger
  * /user/{id}/follow:
  *   delete:
- *     summary: Unsubscribe from a user
+ *     summary: Unsubscribe from a user by ID
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
@@ -258,6 +300,28 @@ router.post('/:id/follow', authenticateToken, userController.follow);
  *         description: Bad request
  */
 router.delete('/:id/follow', authenticateToken, userController.unfollow);
+
+/**
+ * @swagger
+ * /user/username/{username}/follow:
+ *   delete:
+ *     summary: Unsubscribe from a user by username
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Unsubscribed successfully
+ *       400:
+ *         description: Bad request
+ */
+router.delete('/username/:username/follow', authenticateToken, userController.unfollowByUsername);
 
 /**
  * @swagger

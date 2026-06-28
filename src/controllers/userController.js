@@ -80,6 +80,15 @@ class UserController {
     }
   }
 
+  async getByUsername(req, res) {
+    try {
+      const user = await userService.getUserByUsername(req.params.username);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(404).json({ success: false, message: translateErrorMessage(error) });
+    }
+  }
+
   async me(req, res) {
     try {
       const user = await userService.getMe(req.user.id);
@@ -98,9 +107,27 @@ class UserController {
     }
   }
 
+  async followByUsername(req, res) {
+    try {
+      const user = await userService.followByUsername(req.user.id, req.params.username);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
+    }
+  }
+
   async unfollow(req, res) {
     try {
       const user = await userService.unfollow(req.user.id, req.params.id);
+      res.json({ success: true, data: user });
+    } catch (error) {
+      res.status(400).json({ success: false, message: translateErrorMessage(error) });
+    }
+  }
+
+  async unfollowByUsername(req, res) {
+    try {
+      const user = await userService.unfollowByUsername(req.user.id, req.params.username);
       res.json({ success: true, data: user });
     } catch (error) {
       res.status(400).json({ success: false, message: translateErrorMessage(error) });
