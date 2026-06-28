@@ -1,7 +1,7 @@
 const express = require('express');
 const { PostController, upload } = require('../controllers/postController');
 const { CommentController } = require('../controllers/commentController');
-const { authenticateToken, optionalAuthenticateToken } = require('../middleware/auth');
+const { authenticateToken, optionalAuthenticateToken, optionalAuthenticateToken2 } = require('../middleware/auth');
 const adminOnly = require('../middleware/admin');
 
 const router = express.Router();
@@ -48,7 +48,7 @@ const router = express.Router();
  *       200:
  *         description: List of posts
  */
-router.get('/list', optionalAuthenticateToken, PostController.getPosts);
+router.get('/list', optionalAuthenticateToken2, PostController.getPosts);
 
 /**
  * @swagger

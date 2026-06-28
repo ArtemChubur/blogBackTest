@@ -30,6 +30,26 @@ const optionalAuthenticateToken = (req, res, next) => {
   });
 };
 
+const optionalAuthenticateToken2 = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    req.user = null;
+    return next();
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      req.user = null; // считаем гостем
+      return next();
+    }
+
+    req.user = user;
+    next();
+  });
+};
+
 const authenticateRefreshToken = (req, res, next) => {
   const { refreshToken } = req.body;
   if (!refreshToken) return res.status(401).json({ success: false, message: translateErrorMessage('Refresh token required') });
@@ -41,4 +61,4 @@ const authenticateRefreshToken = (req, res, next) => {
   });
 };
 
-module.exports = { authenticateToken, authenticateRefreshToken, optionalAuthenticateToken };
+module.exports = { authenticateToken, authenticateRefreshToken, optionalAuthenticateToken, optionalAuthenticateToken2 };
